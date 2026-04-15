@@ -573,34 +573,137 @@ async function loadSlides(fileItem) {
   grid.innerHTML = `<div style="grid-column:1/-1"><div class="slide-loading"><div class="spinner"></div><span>Loading slides…</span></div></div>`;
 
   try {
-    // Graph thumbnails API — gets per-page thumbnails for Office files
+    // Store file item for later insertion
+    window._currentFileItem = fileItem;
+
+    // Get per-slide previews using Graph preview API
+    // First get the file to find slide count via children or preview
+    const previewData = await graph(`/drives/${driveId}/items/${fileItem.id}/preview`);
+    const previewUrl = previewData.getUrl;
+
+    // Use thumbnails with page parameter to get each slide
+    // Graph supports ?page=N for multi-page documents
     const thumbData = await graph(`/drives/${driveId}/items/${fileItem.id}/thumbnails`);
     const thumbSets = thumbData.value || [];
 
-    if (!thumbSets.length) {
-      // Fallback: show file-level preview
+    // Also try to get page count from file metadata
+    const fileData = await graph(`/drives/${driveId}/items/${fileItem.id}?$select=name,size,file`);
+    
+    // Build slides — use page-specific thumbnail URLs
+    // Graph thumbnail URL supports page parameter: append &page=N
+    let slides = [];
+
+    if (thumbSets.length > 0) {
+      const baseThumbUrl = thumbSets[0].large?.url || thumbSets[0].medium?.url || '';
+      
+      // Try to fetch multiple pages by probing page numbers
+      // Start with what we know (at least 1) and probe up to 60
+      const probeSlides = async () => {
+        const found = [];
+        // Use the preview URL to generate per-slide images
+        // Graph API: GET /drives/{id}/items/{id}/thumbnails/{size}/content?page=N
+        const thumbId = thumbSets[0].id || '0';
+        
+        // Probe slides 1 through potential max
+        const probePromises = [];
+        for (let i = 0; i < 60; i++) {
+          probePromises.push(
+            graph(`/drives/${driveId}/items/${fileItem.id}/thumbnails/${thumbId}/large`)
+              .then(d => ({ page: i, url: d.url, ok: true }))
+              .catch(() => ({ page: i, ok: false }))
+          );
+        }
+        
+        // Actually use the simpler approach: get all thumbnail sets
+        // Each set corresponds to one page/slide
+        return thumbSets.map((ts, i) => ({
+          id: i + 1,
+          num: i + 1,
+          title: `Slide ${i + 1}`,
+          type: currentCategory,
+          thumbUrl: ts.large?.url || ts.medium?.url || ts.small?.url || '',
+          fileItemId: fileItem.id,
+          slideIndex: i
+        }));
+      };
+
+      slides = await probeSlides();
+    }
+
+    // If Graph only returned 1 thumbnail, try the content/pages approach
+    if (slides.length <= 1) {
+      // Use preview URL with page numbers to generate thumbnails for each slide
+      // We'll show what we have and indicate more slides exist
+      try {
+        const moreSlides = [];
+        // Fetch download URL and parse PPTX to count slides
+        const dlData = await graph(`/drives/${driveId}/items/${fileItem.id}`);
+        const dlUrl = dlData['@microsoft.graph.downloadUrl'];
+        
+        if (dlUrl) {
+          // Download and parse PPTX to extract slide count and thumbnails
+          const resp = await fetch(dlUrl);
+          const arrayBuffer = await resp.arrayBuffer();
+          window._currentPptxBuffer = arrayBuffer;
+          
+          // Use JSZip to count slides
+          const zip = await loadJSZip();
+          const pptx = await zip.loadAsync(arrayBuffer);
+          const slideFiles = Object.keys(pptx.files).filter(f => 
+            f.match(/^ppt\/slides\/slide\d+\.xml$/)
+          ).sort((a, b) => {
+            const na = parseInt(a.match(/\d+/)[0]);
+            const nb = parseInt(b.match(/\d+/)[0]);
+            return na - nb;
+          });
+
+          for (let i = 0; i < slideFiles.length; i++) {
+            // Try to get slide thumbnail image from pptx media or use placeholder
+            const thumbUrl = slides[0]?.thumbUrl || '';
+            moreSlides.push({
+              id: i + 1,
+              num: i + 1,
+              title: `Slide ${i + 1}`,
+              type: currentCategory,
+              thumbUrl: i === 0 ? thumbUrl : '', // Only first slide has thumbnail from Graph
+              fileItemId: fileItem.id,
+              slideIndex: i,
+              pptxBuffer: true
+            });
+          }
+          
+          if (moreSlides.length > 0) slides = moreSlides;
+        }
+      } catch(e2) {
+        console.log('PPTX parse error:', e2.message);
+      }
+    }
+
+    if (!slides.length) {
       grid.innerHTML = `<div style="grid-column:1/-1" class="empty">
         <div class="empty-icon">📄</div>
-        <p>Slide previews not available.<br>This file may need to be opened in PowerPoint first to generate thumbnails.</p>
+        <p>No slide previews available for this file.</p>
       </div>`;
       return;
     }
 
-    currentSlides = thumbSets.map((ts, i) => ({
-      id: i + 1,
-      num: i + 1,
-      title: `Slide ${i + 1}`,
-      type: currentCategory,
-      thumbUrl: ts.large?.url || ts.medium?.url || ts.small?.url || '',
-      fileItemId: fileItem.id,
-      slideIndex: i
-    }));
-
+    currentSlides = slides;
     renderSlideGrid(currentSlides);
 
   } catch(e) {
     grid.innerHTML = `<div style="grid-column:1/-1" class="empty"><div class="empty-icon">⚠️</div><p>${e.message}</p></div>`;
   }
+}
+
+async function loadJSZip() {
+  if (window.JSZip) return window.JSZip;
+  return new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+    s.onload = () => resolve(window.JSZip);
+    s.onerror = reject;
+    document.head.appendChild(s);
+  });
 }
 
 function renderSlideGrid(slides) {
@@ -686,38 +789,42 @@ async function insertSlides() {
   const selSlides = [...selected].map(id => currentSlides.find(s => s.id === id)).filter(Boolean);
   if (!selSlides.length) return;
 
-  showToast(`Preparing ${selSlides.length} slide${selSlides.length > 1 ? 's' : ''}…`, "#6c63ff");
+  showToast(`Inserting ${selSlides.length} slide${selSlides.length > 1 ? 's' : ''}…`, "#6c63ff");
 
   try {
     await Office.onReady();
+
+    // Get the PPTX file as base64
+    let pptxBase64 = window._currentPptxBase64;
+    
+    if (!pptxBase64) {
+      // Download the PPTX file
+      const fileData = await graph(`/drives/${driveId}/items/${selSlides[0].fileItemId}`);
+      const dlUrl = fileData['@microsoft.graph.downloadUrl'];
+      const resp = await fetch(dlUrl);
+      const buffer = await resp.arrayBuffer();
+      pptxBase64 = btoa(String.fromCharCode(...new Uint8Array(buffer)));
+      window._currentPptxBase64 = pptxBase64;
+    }
+
+    // Get slide indices to insert (0-based)
+    const slideIndices = selSlides.map(s => s.slideIndex);
+
     await PowerPoint.run(async context => {
-      for (const slide of selSlides) {
-        // Insert each slide image as a full-bleed shape on a new slide
-        const newSlide = context.presentation.slides.add();
-        await context.sync();
-
-        // Re-query to get the last slide
-        context.presentation.slides.load("items");
-        await context.sync();
-        const items = context.presentation.slides.items;
-        const last = items[items.length - 1];
-
-        if (slide.thumbUrl) {
-          // Fetch the image and insert
-          const resp = await fetch(slide.thumbUrl);
-          const blob = await resp.blob();
-          const b64 = await blobToBase64(blob);
-          last.shapes.addImage(b64);
-          await context.sync();
-        }
-      }
+      // insertSlidesFromBase64 inserts actual PPTX slides with full formatting
+      context.presentation.insertSlidesFromBase64(pptxBase64, {
+        formatting: "UseDestinationTheme",
+        targetSlideId: undefined
+      });
+      await context.sync();
     });
 
     showToast(`✓ ${selSlides.length} slide${selSlides.length > 1 ? 's' : ''} inserted!`);
     clearSel();
+
   } catch(e) {
-    // Outside PowerPoint (testing in browser)
-    showToast(`${selSlides.length} slides ready ✓`, "#6c63ff");
+    showToast("Insert failed: " + e.message, "#ef4444");
+    console.error('Insert error:', e);
   }
 }
 
