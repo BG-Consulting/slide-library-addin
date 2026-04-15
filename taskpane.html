@@ -573,118 +573,72 @@ async function loadSlides(fileItem) {
   grid.innerHTML = `<div style="grid-column:1/-1"><div class="slide-loading"><div class="spinner"></div><span>Loading slides…</span></div></div>`;
 
   try {
-    // Store file item for later insertion
     window._currentFileItem = fileItem;
+    window._currentPptxBase64 = null;
 
-    // Get per-slide previews using Graph preview API
-    // First get the file to find slide count via children or preview
-    const previewData = await graph(`/drives/${driveId}/items/${fileItem.id}/preview`);
-    const previewUrl = previewData.getUrl;
+    // Step 1: Get download URL
+    const fileData = await graph(`/drives/${driveId}/items/${fileItem.id}`);
+    const dlUrl = fileData['@microsoft.graph.downloadUrl'];
 
-    // Use thumbnails with page parameter to get each slide
-    // Graph supports ?page=N for multi-page documents
-    const thumbData = await graph(`/drives/${driveId}/items/${fileItem.id}/thumbnails`);
-    const thumbSets = thumbData.value || [];
+    // Step 2: Download the PPTX
+    const resp = await fetch(dlUrl);
+    const buffer = await resp.arrayBuffer();
 
-    // Also try to get page count from file metadata
-    const fileData = await graph(`/drives/${driveId}/items/${fileItem.id}?$select=name,size,file`);
-    
-    // Build slides — use page-specific thumbnail URLs
-    // Graph thumbnail URL supports page parameter: append &page=N
-    let slides = [];
+    // Step 3: Convert to base64 for insertion later
+    const uint8 = new Uint8Array(buffer);
+    let binary = '';
+    for (let i = 0; i < uint8.length; i++) binary += String.fromCharCode(uint8[i]);
+    window._currentPptxBase64 = btoa(binary);
 
-    if (thumbSets.length > 0) {
-      const baseThumbUrl = thumbSets[0].large?.url || thumbSets[0].medium?.url || '';
-      
-      // Try to fetch multiple pages by probing page numbers
-      // Start with what we know (at least 1) and probe up to 60
-      const probeSlides = async () => {
-        const found = [];
-        // Use the preview URL to generate per-slide images
-        // Graph API: GET /drives/{id}/items/{id}/thumbnails/{size}/content?page=N
-        const thumbId = thumbSets[0].id || '0';
-        
-        // Probe slides 1 through potential max
-        const probePromises = [];
-        for (let i = 0; i < 60; i++) {
-          probePromises.push(
-            graph(`/drives/${driveId}/items/${fileItem.id}/thumbnails/${thumbId}/large`)
-              .then(d => ({ page: i, url: d.url, ok: true }))
-              .catch(() => ({ page: i, ok: false }))
-          );
-        }
-        
-        // Actually use the simpler approach: get all thumbnail sets
-        // Each set corresponds to one page/slide
-        return thumbSets.map((ts, i) => ({
-          id: i + 1,
-          num: i + 1,
-          title: `Slide ${i + 1}`,
-          type: currentCategory,
-          thumbUrl: ts.large?.url || ts.medium?.url || ts.small?.url || '',
-          fileItemId: fileItem.id,
-          slideIndex: i
-        }));
-      };
+    // Step 4: Use JSZip to read slide count and thumbnail images
+    const zip = await loadJSZip();
+    const pptx = await zip.loadAsync(buffer);
 
-      slides = await probeSlides();
-    }
+    // Count slides
+    const slideFiles = Object.keys(pptx.files)
+      .filter(f => f.match(/^ppt\/slides\/slide\d+\.xml$/))
+      .sort((a, b) => {
+        const na = parseInt(a.match(/(\d+)/)[0]);
+        const nb = parseInt(b.match(/(\d+)/)[0]);
+        return na - nb;
+      });
 
-    // If Graph only returned 1 thumbnail, try the content/pages approach
-    if (slides.length <= 1) {
-      // Use preview URL with page numbers to generate thumbnails for each slide
-      // We'll show what we have and indicate more slides exist
-      try {
-        const moreSlides = [];
-        // Fetch download URL and parse PPTX to count slides
-        const dlData = await graph(`/drives/${driveId}/items/${fileItem.id}`);
-        const dlUrl = dlData['@microsoft.graph.downloadUrl'];
-        
-        if (dlUrl) {
-          // Download and parse PPTX to extract slide count and thumbnails
-          const resp = await fetch(dlUrl);
-          const arrayBuffer = await resp.arrayBuffer();
-          window._currentPptxBuffer = arrayBuffer;
-          
-          // Use JSZip to count slides
-          const zip = await loadJSZip();
-          const pptx = await zip.loadAsync(arrayBuffer);
-          const slideFiles = Object.keys(pptx.files).filter(f => 
-            f.match(/^ppt\/slides\/slide\d+\.xml$/)
-          ).sort((a, b) => {
-            const na = parseInt(a.match(/\d+/)[0]);
-            const nb = parseInt(b.match(/\d+/)[0]);
-            return na - nb;
-          });
-
-          for (let i = 0; i < slideFiles.length; i++) {
-            // Try to get slide thumbnail image from pptx media or use placeholder
-            const thumbUrl = slides[0]?.thumbUrl || '';
-            moreSlides.push({
-              id: i + 1,
-              num: i + 1,
-              title: `Slide ${i + 1}`,
-              type: currentCategory,
-              thumbUrl: i === 0 ? thumbUrl : '', // Only first slide has thumbnail from Graph
-              fileItemId: fileItem.id,
-              slideIndex: i,
-              pptxBuffer: true
-            });
-          }
-          
-          if (moreSlides.length > 0) slides = moreSlides;
-        }
-      } catch(e2) {
-        console.log('PPTX parse error:', e2.message);
-      }
-    }
-
-    if (!slides.length) {
-      grid.innerHTML = `<div style="grid-column:1/-1" class="empty">
-        <div class="empty-icon">📄</div>
-        <p>No slide previews available for this file.</p>
-      </div>`;
+    if (!slideFiles.length) {
+      grid.innerHTML = `<div style="grid-column:1/-1" class="empty"><div class="empty-icon">📄</div><p>No slides found in this file.</p></div>`;
       return;
+    }
+
+    // Step 5: Extract thumbnail images from ppt/media or ppt/slides/_rels
+    // Try to get slide thumbnail images from ppt/slides/thumbnails
+    const slides = [];
+    for (let i = 0; i < slideFiles.length; i++) {
+      let thumbUrl = '';
+
+      // Try thumbnail folder first (some PPTX files have these)
+      const thumbFile = pptx.files[`ppt/slides/_rels/slide${i+1}.xml.rels`];
+      if (thumbFile) {
+        const relsXml = await thumbFile.async('string');
+        const imgMatch = relsXml.match(/Target="\.\.\/media\/([^"]+)"/);
+        if (imgMatch) {
+          const mediaFile = pptx.files[`ppt/media/${imgMatch[1]}`];
+          if (mediaFile && imgMatch[1].match(/\.(jpg|jpeg|png|gif)$/i)) {
+            const imgData = await mediaFile.async('base64');
+            const ext = imgMatch[1].split('.').pop().toLowerCase();
+            const mime = ext === 'jpg' || ext === 'jpeg' ? 'image/jpeg' : `image/${ext}`;
+            thumbUrl = `data:${mime};base64,${imgData}`;
+          }
+        }
+      }
+
+      slides.push({
+        id: i + 1,
+        num: i + 1,
+        title: `Slide ${i + 1}`,
+        type: currentCategory,
+        thumbUrl,
+        fileItemId: fileItem.id,
+        slideIndex: i
+      });
     }
 
     currentSlides = slides;
@@ -796,26 +750,31 @@ async function insertSlides() {
 
     // Get the PPTX file as base64
     let pptxBase64 = window._currentPptxBase64;
-    
+
     if (!pptxBase64) {
-      // Download the PPTX file
       const fileData = await graph(`/drives/${driveId}/items/${selSlides[0].fileItemId}`);
       const dlUrl = fileData['@microsoft.graph.downloadUrl'];
       const resp = await fetch(dlUrl);
       const buffer = await resp.arrayBuffer();
-      pptxBase64 = btoa(String.fromCharCode(...new Uint8Array(buffer)));
+      // Convert to base64 in chunks to avoid stack overflow
+      const bytes = new Uint8Array(buffer);
+      let binary = '';
+      const chunkSize = 8192;
+      for (let i = 0; i < bytes.length; i += chunkSize) {
+        binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize));
+      }
+      pptxBase64 = btoa(binary);
       window._currentPptxBase64 = pptxBase64;
     }
 
-    // Get slide indices to insert (0-based)
-    const slideIndices = selSlides.map(s => s.slideIndex);
-
     await PowerPoint.run(async context => {
-      // insertSlidesFromBase64 inserts actual PPTX slides with full formatting
-      context.presentation.insertSlidesFromBase64(pptxBase64, {
-        formatting: "UseDestinationTheme",
-        targetSlideId: undefined
-      });
+      // Insert only the selected slides by their 0-based index
+      for (const slide of selSlides) {
+        context.presentation.insertSlidesFromBase64(pptxBase64, {
+          formatting: "UseDestinationTheme",
+          sourceSlideIds: [slide.slideIndex + 1] // 1-based slide ID
+        });
+      }
       await context.sync();
     });
 
