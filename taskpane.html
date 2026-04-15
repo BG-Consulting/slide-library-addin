@@ -78,192 +78,168 @@ var st,ct,ut,lt,dt,ht,pt,gt,ft,mt=function(){function t(e,t,r){this.networkInter
 </script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
-
 :root {
-  --bg: #0f0f17;
-  --surface: #17171f;
-  --surface2: #1f1f2e;
-  --border: #2c2c3e;
-  --text: #e8e8f2;
-  --muted: #68688a;
-  --accent: #6c63ff;
-  --success: #4ade80;
-  --radius: 9px;
+  --bg: #0f0f17; --surface: #17171f; --surface2: #1f1f2e;
+  --border: #2c2c3e; --text: #e8e8f2; --muted: #68688a;
+  --accent: #6c63ff; --success: #4ade80; --radius: 9px;
 }
-
 * { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { width: 100%; height: 100%; font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); font-size: 13px; overflow: hidden; }
-.app { display: flex; flex-direction: column; height: 100vh; }
+html, body { width:100%; height:100%; font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); font-size:13px; overflow:hidden; }
+.app { display:flex; flex-direction:column; height:100vh; }
 
-/* ── Screens ── */
-.screen { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; padding: 28px 20px; text-align: center; gap: 14px; }
-.screen.hidden { display: none; }
-.screen-icon { font-size: 42px; }
-.screen h2 { font-size: 17px; font-weight: 700; letter-spacing: -0.3px; }
-.screen p { color: var(--muted); font-size: 12px; line-height: 1.7; max-width: 230px; }
-.spinner { width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.75s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
-.progress-bar { width: 200px; height: 3px; background: var(--border); border-radius: 3px; overflow: hidden; }
-.progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), #a78bfa); border-radius: 3px; transition: width 0.4s ease; width: 0%; }
-.prog-label { font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; }
-.btn-main { background: linear-gradient(135deg, var(--accent), #8b5cf6); color: #fff; border: none; padding: 12px 28px; border-radius: var(--radius); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; width: 100%; max-width: 220px; transition: opacity 0.2s; }
-.btn-main:hover { opacity: 0.88; }
-.err-box { background: #1f1014; border: 1px solid #7f1d1d; border-radius: 10px; padding: 12px 16px; max-width: 240px; font-size: 11px; color: #fca5a5; line-height: 1.7; font-family: 'DM Mono', monospace; text-align: left; }
-.btn-ghost { background: none; border: 1px solid var(--border); color: var(--muted); padding: 9px 20px; border-radius: var(--radius); font-family: 'DM Sans', sans-serif; font-size: 12px; cursor: pointer; width: 100%; max-width: 220px; }
-.btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+/* Screens */
+.screen { display:flex; flex-direction:column; align-items:center; justify-content:center; flex:1; padding:28px 20px; text-align:center; gap:14px; }
+.screen.hidden { display:none; }
+.screen-icon { font-size:42px; }
+.screen h2 { font-size:17px; font-weight:700; }
+.screen p { color:var(--muted); font-size:12px; line-height:1.7; max-width:230px; }
+.spinner { width:36px; height:36px; border:3px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin 0.75s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+.btn-main { background:linear-gradient(135deg,var(--accent),#8b5cf6); color:#fff; border:none; padding:12px 28px; border-radius:var(--radius); font-family:'DM Sans',sans-serif; font-size:13px; font-weight:700; cursor:pointer; width:100%; max-width:220px; }
+.btn-main:hover { opacity:0.88; }
+.err-box { background:#1f1014; border:1px solid #7f1d1d; border-radius:10px; padding:12px 16px; max-width:240px; font-size:11px; color:#fca5a5; line-height:1.7; font-family:'DM Mono',monospace; text-align:left; }
+.btn-ghost { background:none; border:1px solid var(--border); color:var(--muted); padding:9px 20px; border-radius:var(--radius); font-family:'DM Sans',sans-serif; font-size:12px; cursor:pointer; width:100%; max-width:220px; }
+.btn-ghost:hover { border-color:var(--accent); color:var(--accent); }
 
-/* ── Top bar ── */
-.topbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 11px 14px; display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
-.logo-mark { width: 26px; height: 26px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; }
-.logo-text { font-weight: 700; font-size: 13px; letter-spacing: -0.3px; flex: 1; }
-.logo-text em { font-style: normal; color: var(--accent); }
-.topbar-actions { display: flex; gap: 6px; align-items: center; }
-.icon-btn { background: none; border: 1px solid var(--border); color: var(--muted); width: 27px; height: 27px; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s; }
-.icon-btn:hover { border-color: var(--accent); color: var(--accent); }
-.icon-btn.spinning svg { animation: spin 1s linear infinite; }
+/* Header */
+.header { padding:12px 14px 10px; background:var(--surface); border-bottom:1px solid var(--border); flex-shrink:0; }
+.header-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+.logo { display:flex; align-items:center; gap:8px; }
+.logo-mark { width:28px; height:28px; border-radius:7px; background:linear-gradient(135deg,var(--accent),#ff6584); display:flex; align-items:center; justify-content:center; font-size:14px; }
+.logo-name { font-weight:700; font-size:14px; letter-spacing:-0.4px; }
+.logo-name em { font-style:normal; color:var(--accent); }
+.icon-btn { background:none; border:1px solid var(--border); color:var(--muted); width:28px; height:28px; border-radius:6px; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all 0.15s; }
+.icon-btn:hover { border-color:var(--accent); color:var(--accent); }
+.icon-btn.spinning svg { animation:spin 1s linear infinite; }
+.search-wrap { position:relative; }
+.search-ico { position:absolute; left:10px; top:50%; transform:translateY(-50%); color:var(--muted); pointer-events:none; }
+#search { width:100%; padding:8px 10px 8px 32px; background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius); color:var(--text); font-size:12px; font-family:'DM Sans',sans-serif; outline:none; transition:border-color 0.2s; }
+#search::placeholder { color:var(--muted); }
+#search:focus { border-color:var(--accent); }
 
-/* ── Breadcrumb ── */
-.breadcrumb { padding: 8px 14px; background: var(--bg); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted); flex-shrink: 0; min-height: 34px; }
-.bc-item { cursor: pointer; transition: color 0.15s; white-space: nowrap; }
-.bc-item:hover { color: var(--text); }
-.bc-item.active { color: var(--text); font-weight: 600; cursor: default; }
-.bc-sep { color: var(--border); }
-.bc-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+/* Breadcrumb */
+.breadcrumb { padding:7px 14px; background:var(--bg); border-bottom:1px solid var(--border); display:flex; align-items:center; gap:6px; font-size:11px; color:var(--muted); flex-shrink:0; }
+.bc-item { cursor:pointer; transition:color 0.15s; }
+.bc-item:hover { color:var(--text); }
+.bc-item.active { color:var(--text); font-weight:600; cursor:default; }
+.bc-sep { color:var(--border); }
 
-/* ── Step 1: Theme picker ── */
-.theme-grid { display: flex; flex-direction: column; gap: 10px; padding: 16px 14px 90px; overflow-y: auto; flex: 1; }
-.theme-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: 12px; padding: 16px; cursor: pointer; transition: all 0.18s; display: flex; align-items: center; gap: 14px; }
-.theme-card:hover { border-color: var(--accent); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(108,99,255,0.15); }
-.theme-swatch { width: 42px; height: 42px; border-radius: 10px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 18px; }
-.theme-info { flex: 1; }
-.theme-name { font-weight: 700; font-size: 14px; margin-bottom: 2px; }
-.theme-desc { font-size: 11px; color: var(--muted); }
-.theme-arrow { color: var(--muted); font-size: 16px; }
+/* Step 1: Categories */
+.cat-list { display:flex; flex-direction:column; gap:8px; padding:12px 14px 90px; overflow-y:auto; flex:1; }
+.cat-list::-webkit-scrollbar { width:3px; }
+.cat-list::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
+.cat-card { background:var(--surface); border:1.5px solid var(--border); border-radius:10px; padding:13px 14px; cursor:pointer; transition:all 0.15s; display:flex; align-items:center; gap:12px; }
+.cat-card:hover { border-color:var(--accent); transform:translateX(2px); }
+.cat-icon { font-size:20px; flex-shrink:0; }
+.cat-name { font-weight:600; font-size:13px; flex:1; }
+.cat-count { font-size:10px; color:var(--muted); font-family:'DM Mono',monospace; }
+.cat-loading { display:flex; flex-direction:column; align-items:center; gap:12px; padding:40px 20px; color:var(--muted); }
 
-/* ── Step 2: Category picker ── */
-.cat-grid { display: flex; flex-direction: column; gap: 8px; padding: 14px 14px 90px; overflow-y: auto; flex: 1; }
-.cat-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: 10px; padding: 13px 14px; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 12px; }
-.cat-card:hover { border-color: var(--accent); transform: translateX(2px); }
-.cat-icon { font-size: 20px; flex-shrink: 0; }
-.cat-info { flex: 1; }
-.cat-name { font-weight: 600; font-size: 13px; margin-bottom: 2px; }
-.cat-meta { font-size: 10px; color: var(--muted); font-family: 'DM Mono', monospace; }
-.cat-arrow { color: var(--muted); }
-.cat-loading { text-align: center; padding: 40px 20px; color: var(--muted); display: flex; flex-direction: column; align-items: center; gap: 12px; }
+/* Step 2: Slides */
+.slide-toolbar { padding:8px 14px; background:var(--surface); border-bottom:1px solid var(--border); flex-shrink:0; }
+.grid-wrap { flex:1; overflow-y:auto; padding:10px 10px 82px; }
+.grid-wrap::-webkit-scrollbar { width:3px; }
+.grid-wrap::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
+.grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.card { background:var(--surface); border:1.5px solid var(--border); border-radius:var(--radius); overflow:hidden; cursor:pointer; transition:all 0.15s; position:relative; }
+.card:hover { border-color:var(--accent); transform:translateY(-1px); box-shadow:0 4px 16px rgba(108,99,255,0.18); }
+.card.selected { border-color:var(--accent); background:#1b1a32; }
+.card-check { position:absolute; top:5px; right:5px; width:18px; height:18px; background:var(--accent); border-radius:50%; display:flex; align-items:center; justify-content:center; opacity:0; transition:opacity 0.15s; z-index:2; font-size:10px; color:#fff; font-weight:800; }
+.card.selected .card-check { opacity:1; }
+.card-num { position:absolute; top:5px; left:5px; background:rgba(0,0,0,0.65); color:#fff; font-size:9px; padding:1px 5px; border-radius:4px; font-family:'DM Mono',monospace; z-index:2; }
+.card-thumb { width:100%; aspect-ratio:16/9; object-fit:cover; display:block; background:var(--surface2); }
+.card-thumb-ph { width:100%; aspect-ratio:16/9; background:var(--surface2); display:flex; align-items:center; justify-content:center; font-size:11px; color:var(--muted); font-family:'DM Mono',monospace; }
+.card-body { padding:7px 8px; }
+.card-title { font-size:11px; font-weight:600; color:var(--text); line-height:1.35; margin-bottom:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.slide-loading { display:flex; flex-direction:column; align-items:center; gap:12px; padding:40px 20px; color:var(--muted); }
+.empty { text-align:center; padding:44px 20px; color:var(--muted); }
+.empty-icon { font-size:32px; margin-bottom:10px; }
 
-/* ── Step 3: Slide grid ── */
-.slide-toolbar { padding: 8px 14px; background: var(--surface); border-bottom: 1px solid var(--border); flex-shrink: 0; }
-.search-wrap { position: relative; }
-.search-ico { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
-#search { width: 100%; padding: 8px 10px 8px 32px; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-size: 12px; font-family: 'DM Sans', sans-serif; outline: none; transition: border-color 0.2s; }
-#search::placeholder { color: var(--muted); }
-#search:focus { border-color: var(--accent); }
-.grid-wrap { flex: 1; overflow-y: auto; padding: 10px 10px 82px; }
-.grid-wrap::-webkit-scrollbar { width: 3px; }
-.grid-wrap::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.card { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius); overflow: hidden; cursor: pointer; transition: all 0.15s; position: relative; }
-.card:hover { border-color: var(--accent); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(108,99,255,0.18); }
-.card.selected { border-color: var(--accent); background: #1b1a32; }
-.card-check { position: absolute; top: 5px; right: 5px; width: 18px; height: 18px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.15s; z-index: 2; font-size: 10px; color: #fff; font-weight: 800; }
-.card.selected .card-check { opacity: 1; }
-.card-num { position: absolute; top: 5px; left: 5px; background: rgba(0,0,0,0.65); color: #fff; font-size: 9px; padding: 1px 5px; border-radius: 4px; font-family: 'DM Mono', monospace; z-index: 2; }
-.card-thumb { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; background: var(--surface2); }
-.card-thumb-ph { width: 100%; aspect-ratio: 16/9; background: var(--surface2); display: flex; align-items: center; justify-content: center; font-size: 22px; color: var(--muted); }
-.card-body { padding: 7px 8px; }
-.card-title { font-size: 11px; font-weight: 600; color: var(--text); line-height: 1.35; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.card-type { font-size: 10px; color: var(--muted); font-family: 'DM Mono', monospace; }
-.slide-loading { text-align: center; padding: 40px 20px; color: var(--muted); display: flex; flex-direction: column; align-items: center; gap: 12px; }
-.empty { text-align: center; padding: 44px 20px; color: var(--muted); }
-.empty-icon { font-size: 32px; margin-bottom: 10px; }
+/* Bottom bar */
+.bottom-bar { position:fixed; bottom:0; left:0; right:0; background:var(--surface); border-top:1px solid var(--border); padding:10px 14px; display:flex; align-items:center; gap:8px; z-index:50; }
+.sel-info { flex:1; }
+.sel-count { font-weight:700; font-size:13px; }
+.sel-hint { font-size:10px; color:var(--muted); }
+.btn-clear { background:none; border:1px solid var(--border); color:var(--muted); padding:8px 10px; border-radius:var(--radius); font-size:11px; cursor:pointer; display:none; flex-shrink:0; }
+.btn-clear:hover { border-color:#ff6584; color:#ff6584; }
+.btn-insert { background:linear-gradient(135deg,var(--accent),#8b5cf6); color:#fff; border:none; padding:9px 15px; border-radius:var(--radius); font-family:'DM Sans',sans-serif; font-size:12px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:5px; flex-shrink:0; }
+.btn-insert:hover { opacity:0.88; }
+.btn-insert:disabled { opacity:0.35; cursor:not-allowed; }
 
-/* ── Bottom bar ── */
-.bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-top: 1px solid var(--border); padding: 10px 14px; display: flex; align-items: center; gap: 8px; z-index: 50; }
-.sel-info { flex: 1; min-width: 0; }
-.sel-count { font-weight: 700; font-size: 13px; }
-.sel-hint { font-size: 10px; color: var(--muted); }
-.btn-clear { background: none; border: 1px solid var(--border); color: var(--muted); padding: 8px 10px; border-radius: var(--radius); font-size: 11px; cursor: pointer; display: none; flex-shrink: 0; }
-.btn-clear:hover { border-color: #ff6584; color: #ff6584; }
-.btn-insert { background: linear-gradient(135deg, var(--accent), #8b5cf6); color: #fff; border: none; padding: 9px 15px; border-radius: var(--radius); font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 5px; flex-shrink: 0; transition: opacity 0.2s; white-space: nowrap; }
-.btn-insert:hover { opacity: 0.88; }
-.btn-insert:disabled { opacity: 0.35; cursor: not-allowed; }
+/* Preview */
+.preview { position:fixed; inset:0; background:rgba(0,0,0,0.92); z-index:200; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:16px; opacity:0; pointer-events:none; transition:opacity 0.2s; }
+.preview.open { opacity:1; pointer-events:all; }
+.preview img { max-width:100%; max-height:55vh; border-radius:8px; box-shadow:0 24px 64px rgba(0,0,0,0.8); margin-bottom:14px; }
+.prev-title { font-weight:700; font-size:14px; margin-bottom:3px; text-align:center; }
+.prev-meta { font-size:10px; color:var(--muted); margin-bottom:14px; font-family:'DM Mono',monospace; }
+.prev-btns { display:flex; gap:8px; }
+.btn-prev-sel { background:var(--accent); color:#fff; border:none; padding:9px 22px; border-radius:8px; font-family:'DM Sans',sans-serif; font-weight:700; font-size:13px; cursor:pointer; }
+.btn-prev-close { background:var(--surface2); color:var(--text); border:1px solid var(--border); padding:9px 16px; border-radius:8px; font-family:'DM Sans',sans-serif; font-size:13px; cursor:pointer; }
 
-/* ── Preview overlay ── */
-.preview { position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 200; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 16px; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
-.preview.open { opacity: 1; pointer-events: all; }
-.preview img { max-width: 100%; max-height: 52vh; border-radius: 8px; box-shadow: 0 24px 64px rgba(0,0,0,0.8); margin-bottom: 14px; }
-.prev-title { font-weight: 700; font-size: 14px; margin-bottom: 3px; text-align: center; }
-.prev-meta { font-size: 10px; color: var(--muted); margin-bottom: 14px; font-family: 'DM Mono', monospace; }
-.prev-btns { display: flex; gap: 8px; }
-.btn-prev-sel { background: var(--accent); color: #fff; border: none; padding: 9px 22px; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 13px; cursor: pointer; transition: background 0.15s; }
-.btn-prev-close { background: var(--surface2); color: var(--text); border: 1px solid var(--border); padding: 9px 16px; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer; }
-
-/* ── Toast ── */
-.toast { position: fixed; bottom: 72px; left: 50%; transform: translateX(-50%); background: var(--success); color: #000; font-weight: 700; font-size: 12px; padding: 8px 18px; border-radius: 20px; opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; z-index: 300; }
-.toast.show { opacity: 1; }
+/* Toast */
+.toast { position:fixed; bottom:72px; left:50%; transform:translateX(-50%); background:var(--success); color:#000; font-weight:700; font-size:12px; padding:8px 18px; border-radius:20px; opacity:0; transition:opacity 0.3s; pointer-events:none; white-space:nowrap; z-index:300; }
+.toast.show { opacity:1; }
 </style>
 </head>
 <body>
 <div class="app">
 
-<!-- ░░ SCREEN: Sign in ░░ -->
+<!-- Sign in -->
 <div class="screen" id="s-signin">
-  <div class="screen-icon">🔐</div>
-  <h2>Welcome</h2>
-  <p>Sign in with your Beyond Group Microsoft account to access the slide library.</p>
+  <div class="screen-icon">📊</div>
+  <h2>Slide Library</h2>
+  <p>Sign in with your Beyond Group account to access the slide library.</p>
   <button class="btn-main" onclick="signIn()">Sign in with Microsoft</button>
 </div>
 
-<!-- ░░ SCREEN: Loading ░░ -->
+<!-- Loading -->
 <div class="screen hidden" id="s-loading">
   <div class="spinner"></div>
   <h2 id="load-title">Loading…</h2>
-  <div class="progress-bar"><div class="progress-fill" id="prog-fill"></div></div>
-  <div class="prog-label" id="prog-label">Connecting…</div>
+  <p id="load-sub" style="color:var(--muted);font-size:11px;font-family:monospace"></p>
 </div>
 
-<!-- ░░ SCREEN: Error ░░ -->
+<!-- Error -->
 <div class="screen hidden" id="s-error">
   <div class="screen-icon">⚠️</div>
   <h2>Something went wrong</h2>
-  <div class="err-box" id="err-msg">Unknown error</div>
-  <button class="btn-main" onclick="retryFromError()">Try again</button>
+  <div class="err-box" id="err-msg"></div>
+  <button class="btn-main" onclick="location.reload()">Try again</button>
   <button class="btn-ghost" onclick="signOut()">Sign out</button>
 </div>
 
-<!-- ░░ MAIN APP ░░ -->
+<!-- Main app -->
 <div id="main-app" style="display:none;flex-direction:column;height:100vh;">
 
-  <!-- Top bar -->
-  <div class="topbar">
-    <div class="logo-mark" id="logo-mark">📊</div>
-    <div class="logo-text">Slide<em>Lib</em></div>
-    <div class="topbar-actions">
-      <div class="icon-btn" id="sync-btn" title="Refresh" onclick="syncCurrent()">
-        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+  <div class="header">
+    <div class="header-row">
+      <div class="logo">
+        <div class="logo-mark">📊</div>
+        <div class="logo-name">Slide<em>Lib</em></div>
       </div>
-      <div class="icon-btn" title="Sign out" onclick="signOut()">
-        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      <div style="display:flex;gap:6px">
+        <div class="icon-btn" id="sync-btn" title="Refresh" onclick="syncCurrent()">
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+        </div>
+        <div class="icon-btn" title="Sign out" onclick="signOut()">
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </div>
       </div>
+    </div>
+    <div class="search-wrap" id="search-row" style="display:none">
+      <svg class="search-ico" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input id="search" type="text" placeholder="Search slides…">
     </div>
   </div>
 
-  <!-- Breadcrumb -->
   <div class="breadcrumb" id="breadcrumb">
-    <span class="bc-item active">Choose Theme</span>
+    <span class="bc-item active">Categories</span>
   </div>
 
-  <!-- Step 1: Theme picker -->
-  <div class="theme-grid" id="step-theme">
-    <!-- populated by JS -->
-  </div>
+  <!-- Step 1: Categories -->
+  <div class="cat-list" id="step-categories"></div>
 
-  <!-- Step 2: Category picker -->
-  <div id="step-category" style="display:none;flex-direction:column;flex:1;overflow:hidden;">
-    <div class="cat-grid" id="cat-grid"></div>
-  </div>
-
-  <!-- Step 3: Slides -->
+  <!-- Step 2: Slides -->
   <div id="step-slides" style="display:none;flex-direction:column;flex:1;overflow:hidden;">
     <div class="slide-toolbar">
       <div class="search-wrap">
@@ -276,7 +252,6 @@ html, body { width: 100%; height: 100%; font-family: 'DM Sans', sans-serif; back
     </div>
   </div>
 
-  <!-- Bottom bar (only shown on step 3) -->
   <div class="bottom-bar" id="bottom-bar" style="display:none;">
     <div class="sel-info">
       <div class="sel-count" id="sel-count">0 selected</div>
@@ -285,13 +260,11 @@ html, body { width: 100%; height: 100%; font-family: 'DM Sans', sans-serif; back
     <button class="btn-clear" id="btn-clear" onclick="clearSel()">Clear</button>
     <button class="btn-insert" id="btn-insert" onclick="insertSlides()" disabled>⚡ Insert</button>
   </div>
+</div>
+</div>
 
-</div><!-- /main-app -->
-
-</div><!-- /app -->
-
-<!-- Preview overlay -->
-<div class="preview" id="preview" onclick="closePreviewClick(event)">
+<!-- Preview -->
+<div class="preview" id="preview" onclick="if(event.target===this)closePreview()">
   <img id="prev-img" src="" alt="">
   <div class="prev-title" id="prev-title"></div>
   <div class="prev-meta" id="prev-meta"></div>
@@ -300,34 +273,20 @@ html, body { width: 100%; height: 100%; font-family: 'DM Sans', sans-serif; back
     <button class="btn-prev-close" onclick="closePreview()">Close</button>
   </div>
 </div>
-
 <div class="toast" id="toast"></div>
 
 <script>
-// ══════════════════════════════════════════════════
-//  CONFIG — Beyond Group
-// ══════════════════════════════════════════════════
 const CONFIG = {
   CLIENT_ID:       "51dfcadf-0efa-4d32-afd6-cdf7fdcc1574",
   TENANT_ID:       "4c8b2896-51c4-473c-942e-a3cca4c64b94",
   SHAREPOINT_HOST: "beyondgroupconsulting.sharepoint.com",
   SITE_PATH:       "/sites/Unit-Outreach",
-  LIBRARY_FOLDER:  "Slide Library",   // folder inside Documents
+  LIBRARY_FOLDER:  "Slide Library",
   SCOPES:          ["Files.Read.All", "Sites.Read.All", "User.Read"]
 };
-// ══════════════════════════════════════════════════
-
-const THEMES = [
-  { id: "Blue",      label: "Blue",      emoji: "🔵", color: "#3b82f6", desc: "Blue deliverables template" },
-  { id: "Corporate", label: "Corporate", emoji: "⚫", color: "#6b7280", desc: "Corporate neutral template" },
-  { id: "Green",     label: "Green",     emoji: "🟢", color: "#22c55e", desc: "Green deliverables template" },
-  { id: "Red",       label: "Red",       emoji: "🔴", color: "#ef4444", desc: "Red deliverables template" },
-  { id: "Yellow",    label: "Yellow",    emoji: "🟡", color: "#eab308", desc: "Yellow deliverables template" }
-];
 
 const CAT_ICONS = {
   "Assessment and Comparison":              "📊",
-  "Blue-Deliverables Template":             "📘",
   "Charts and Data Visualization":          "📈",
   "Executive Summary Findings and Insights":"📋",
   "M&A and Due Diligence":                  "🤝",
@@ -337,26 +296,13 @@ const CAT_ICONS = {
   "Text and Content Layouts":               "📝"
 };
 
-// ── State ──
-let msalApp = null;
-let token = null;
-let siteId = null;
-let driveId = null;
-let currentTheme = null;
-let currentCategory = null;
-let currentSlides = [];
-let selected = new Set();
-let previewId = null;
-let pressTimer = null;
+let msalApp = null, token = null, siteId = null, driveId = null;
+let currentCategory = null, currentSlides = [], selected = new Set();
+let previewId = null, pressTimer = null;
 
-// ── MSAL init ──
+// ── MSAL ──
 async function initMsal() {
-  // Check MSAL loaded
-  if (typeof msal === 'undefined') {
-    showError("Authentication library failed to load. Please refresh the add-in.");
-    return;
-  }
-
+  if (typeof msal === "undefined") { showError("Auth library failed to load. Please refresh."); return; }
   try {
     msalApp = new msal.PublicClientApplication({
       auth: {
@@ -367,53 +313,28 @@ async function initMsal() {
       cache: { cacheLocation: "sessionStorage" }
     });
     await msalApp.initialize();
-
-    // Handle redirect
-    try {
-      const result = await msalApp.handleRedirectPromise();
-      if (result) token = result.accessToken;
-    } catch(e) { /* ignore */ }
-
+    try { const r = await msalApp.handleRedirectPromise(); if (r) token = r.accessToken; } catch(e) {}
     const accounts = msalApp.getAllAccounts();
-    if (accounts.length > 0 && !token) {
-      try {
-        const r = await msalApp.acquireTokenSilent({ scopes: CONFIG.SCOPES, account: accounts[0] });
-        token = r.accessToken;
-      } catch(e) { token = null; }
+    if (accounts.length && !token) {
+      try { const r = await msalApp.acquireTokenSilent({ scopes: CONFIG.SCOPES, account: accounts[0] }); token = r.accessToken; } catch(e) {}
     }
-
-    if (token) {
-      showMain();
-    } else {
-      show("s-signin");
-    }
-  } catch(e) {
-    showError("Failed to initialize authentication: " + e.message);
-  }
+    if (token) { showMain(); } else { show("s-signin"); }
+  } catch(e) { showError("Failed to initialize: " + e.message); }
 }
 
 async function signIn() {
   try {
-    // Try popup first (desktop PowerPoint)
     const r = await msalApp.loginPopup({ scopes: CONFIG.SCOPES });
-    token = r.accessToken;
-    showMain();
+    token = r.accessToken; showMain();
   } catch(e) {
-    // Fallback to redirect (PowerPoint Web)
-    try {
-      await msalApp.loginRedirect({ scopes: CONFIG.SCOPES });
-    } catch(e2) {
-      showError("Sign-in failed: " + e2.message);
-    }
+    try { await msalApp.loginRedirect({ scopes: CONFIG.SCOPES }); }
+    catch(e2) { showError("Sign-in failed: " + e2.message); }
   }
 }
 
 function signOut() {
-  try {
-    msalApp.logoutPopup().then(() => location.reload());
-  } catch(e) {
-    msalApp.logoutRedirect();
-  }
+  try { msalApp.logoutPopup().then(() => location.reload()); }
+  catch(e) { msalApp.logoutRedirect(); }
 }
 
 async function getToken() {
@@ -423,16 +344,11 @@ async function getToken() {
   return r.accessToken;
 }
 
-// ── Graph API ──
+// ── Graph ──
 async function graph(path) {
   const t = await getToken();
-  const r = await fetch("https://graph.microsoft.com/v1.0" + path, {
-    headers: { Authorization: "Bearer " + t }
-  });
-  if (!r.ok) {
-    const e = await r.json().catch(() => ({}));
-    throw new Error(e?.error?.message || `Graph error ${r.status}`);
-  }
+  const r = await fetch("https://graph.microsoft.com/v1.0" + path, { headers: { Authorization: "Bearer " + t } });
+  if (!r.ok) { const e = await r.json().catch(()=>({})); throw new Error(e?.error?.message || `Graph ${r.status}`); }
   return r.json();
 }
 
@@ -441,291 +357,162 @@ async function getSiteAndDrive() {
   const site = await graph(`/sites/${CONFIG.SHAREPOINT_HOST}:${CONFIG.SITE_PATH}`);
   siteId = site.id;
   const drives = await graph(`/sites/${siteId}/drives`);
-  const docsDrive = drives.value.find(d => d.name === "Documents") || drives.value[0];
-  driveId = docsDrive.id;
+  const docs = drives.value.find(d => d.name === "Documents") || drives.value[0];
+  driveId = docs.id;
 }
 
-async function listThemeFolders() {
-  await getSiteAndDrive();
-  const data = await graph(`/drives/${driveId}/root:/${CONFIG.LIBRARY_FOLDER}:/children`);
-  return data.value.filter(i => i.folder).map(i => i.name);
-}
-
-async function listCategoryFiles(theme) {
-  await getSiteAndDrive();
-  const data = await graph(`/drives/${driveId}/root:/${CONFIG.LIBRARY_FOLDER}/${theme}:/children`);
-  return data.value.filter(i => !i.folder && (i.name.endsWith('.pptx') || i.name.endsWith('.potx')));
-}
-
-async function getSlideThumbnails(theme, fileItem) {
-  // Get thumbnails for a file via Graph
-  const data = await graph(`/drives/${driveId}/items/${fileItem.id}/thumbnails`);
-  return data.value || [];
-}
-
-async function getFileDownloadUrl(itemId) {
-  const data = await graph(`/drives/${driveId}/items/${itemId}`);
-  return data["@microsoft.graph.downloadUrl"];
-}
-
-// ── Show/Hide helpers ──
+// ── Show/hide ──
 function show(id) {
   ["s-signin","s-loading","s-error"].forEach(s => {
     const el = document.getElementById(s);
     if (el) el.classList.toggle("hidden", s !== id);
   });
+  document.getElementById("main-app").style.display = "none";
 }
 
 function showMain() {
-  show("__none__"); // hide all screens
+  ["s-signin","s-loading","s-error"].forEach(s => document.getElementById(s)?.classList.add("hidden"));
   document.getElementById("main-app").style.display = "flex";
-  renderThemes();
+  loadCategories();
 }
 
 function showError(msg) {
   show("s-error");
   document.getElementById("err-msg").textContent = msg;
-  document.getElementById("main-app").style.display = "none";
 }
 
-function retryFromError() {
-  location.reload();
-}
-
-function setProgress(pct, label) {
-  document.getElementById("prog-fill").style.width = pct + "%";
-  document.getElementById("prog-label").textContent = label;
-}
-
-// ── Step 1: Themes ──
-function renderThemes() {
+// ── Step 1: Categories ──
+async function loadCategories() {
   goToStep(1);
-  const grid = document.getElementById("step-theme");
-  grid.innerHTML = THEMES.map(t => `
-    <div class="theme-card" onclick="pickTheme('${t.id}')">
-      <div class="theme-swatch" style="background:${t.color}22;border:2px solid ${t.color}44">${t.emoji}</div>
-      <div class="theme-info">
-        <div class="theme-name" style="color:${t.color}">${t.label}</div>
-        <div class="theme-desc">${t.desc}</div>
-      </div>
-      <div class="theme-arrow">›</div>
-    </div>
-  `).join('');
-}
-
-async function pickTheme(themeId) {
-  currentTheme = THEMES.find(t => t.id === themeId);
-  goToStep(2);
-  await loadCategories(themeId);
-}
-
-// ── Step 2: Categories ──
-async function loadCategories(theme) {
-  const grid = document.getElementById("cat-grid");
-  grid.innerHTML = `<div class="cat-loading"><div class="spinner"></div><span>Loading ${theme} slides…</span></div>`;
-
+  const list = document.getElementById("step-categories");
+  list.innerHTML = `<div class="cat-loading"><div class="spinner"></div><span>Loading categories…</span></div>`;
   try {
-    const files = await listCategoryFiles(theme);
-    if (!files.length) {
-      grid.innerHTML = `<div class="cat-loading">No files found in <strong>${theme}</strong> folder.</div>`;
-      return;
-    }
-
-    // Store files on window for later use
-    window._categoryFiles = {};
-    files.forEach(f => { window._categoryFiles[f.name] = f; });
-
-    grid.innerHTML = files.map(f => {
-      const name = f.name.replace(/\.(pptx|potx)$/i, '');
-      const icon = CAT_ICONS[name] || "📄";
-      return `
-        <div class="cat-card" onclick="pickCategory('${encodeURIComponent(f.name)}')">
-          <div class="cat-icon">${icon}</div>
-          <div class="cat-info">
-            <div class="cat-name">${name}</div>
-            <div class="cat-meta">.pptx · tap to browse slides</div>
-          </div>
-          <svg class="cat-arrow" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
-        </div>`;
-    }).join('');
-
-  } catch(e) {
-    grid.innerHTML = `<div class="cat-loading">⚠️ ${e.message}</div>`;
-  }
+    await getSiteAndDrive();
+    const data = await graph(`/drives/${driveId}/root:/${CONFIG.LIBRARY_FOLDER}:/children`);
+    const folders = data.value.filter(i => i.folder).sort((a,b) => a.name.localeCompare(b.name));
+    if (!folders.length) { list.innerHTML = `<div class="cat-loading">No categories found in Slide Library folder.</div>`; return; }
+    window._categoryFolders = {};
+    folders.forEach(f => { window._categoryFolders[f.name] = f; });
+    list.innerHTML = folders.map(f => {
+      const icon = CAT_ICONS[f.name] || "📄";
+      const count = f.folder?.childCount || "";
+      return `<div class="cat-card" onclick="pickCategory('${encodeURIComponent(f.name)}')">
+        <div class="cat-icon">${icon}</div>
+        <div class="cat-name">${f.name}</div>
+        ${count ? `<span class="cat-count">${count} slides</span>` : ""}
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>`;
+    }).join("");
+  } catch(e) { list.innerHTML = `<div class="cat-loading">⚠️ ${e.message}</div>`; }
 }
 
-async function pickCategory(encodedFilename) {
-  const filename = decodeURIComponent(encodedFilename);
-  currentCategory = filename.replace(/\.(pptx|potx)$/i, '');
-  const fileItem = window._categoryFiles[filename];
-
-  goToStep(3);
-  selected.clear();
-  updateBar();
-  document.getElementById("search").value = "";
-
-  await loadSlides(fileItem);
+async function pickCategory(encoded) {
+  const name = decodeURIComponent(encoded);
+  currentCategory = name;
+  const folder = window._categoryFolders[name];
+  goToStep(2);
+  selected.clear(); updateBar();
+  await loadSlides(folder);
 }
 
-// ── Step 3: Slides ──
-async function loadSlides(fileItem) {
+// ── Step 2: Slides ──
+async function loadSlides(folder) {
   const grid = document.getElementById("slide-grid");
   grid.innerHTML = `<div style="grid-column:1/-1"><div class="slide-loading"><div class="spinner"></div><span>Loading slides…</span></div></div>`;
-
   try {
-    window._currentFileItem = fileItem;
     window._currentPptxBase64 = null;
+    // List all PPTX files in this category folder
+    const data = await graph(`/drives/${driveId}/items/${folder.id}/children`);
+    const files = data.value
+      .filter(f => !f.folder && f.name.match(/\.pptx$/i))
+      .sort((a,b) => a.name.localeCompare(b.name));
 
-    // Step 1: Get download URL
-    const fileData = await graph(`/drives/${driveId}/items/${fileItem.id}`);
-    const dlUrl = fileData['@microsoft.graph.downloadUrl'];
-
-    // Step 2: Download the PPTX
-    const resp = await fetch(dlUrl);
-    const buffer = await resp.arrayBuffer();
-
-    // Step 3: Convert to base64 for insertion later
-    const uint8 = new Uint8Array(buffer);
-    let binary = '';
-    for (let i = 0; i < uint8.length; i++) binary += String.fromCharCode(uint8[i]);
-    window._currentPptxBase64 = btoa(binary);
-
-    // Step 4: Use JSZip to read slide count and thumbnail images
-    const zip = await loadJSZip();
-    const pptx = await zip.loadAsync(buffer);
-
-    // Count slides
-    const slideFiles = Object.keys(pptx.files)
-      .filter(f => f.match(/^ppt\/slides\/slide\d+\.xml$/))
-      .sort((a, b) => {
-        const na = parseInt(a.match(/(\d+)/)[0]);
-        const nb = parseInt(b.match(/(\d+)/)[0]);
-        return na - nb;
-      });
-
-    if (!slideFiles.length) {
-      grid.innerHTML = `<div style="grid-column:1/-1" class="empty"><div class="empty-icon">📄</div><p>No slides found in this file.</p></div>`;
+    if (!files.length) {
+      grid.innerHTML = `<div style="grid-column:1/-1" class="empty"><div class="empty-icon">📄</div><p>No slides found in this category.</p></div>`;
       return;
     }
 
-    // Step 5: Extract thumbnail images from ppt/media or ppt/slides/_rels
-    // Try to get slide thumbnail images from ppt/slides/thumbnails
-    const slides = [];
-    for (let i = 0; i < slideFiles.length; i++) {
-      let thumbUrl = '';
+    // Build slide list — get thumbnail for each file via Graph
+    currentSlides = [];
+    grid.innerHTML = `<div style="grid-column:1/-1"><div class="slide-loading"><div class="spinner"></div><span>Loading ${files.length} slides…</span></div></div>`;
 
-      // Try thumbnail folder first (some PPTX files have these)
-      const thumbFile = pptx.files[`ppt/slides/_rels/slide${i+1}.xml.rels`];
-      if (thumbFile) {
-        const relsXml = await thumbFile.async('string');
-        const imgMatch = relsXml.match(/Target="\.\.\/media\/([^"]+)"/);
-        if (imgMatch) {
-          const mediaFile = pptx.files[`ppt/media/${imgMatch[1]}`];
-          if (mediaFile && imgMatch[1].match(/\.(jpg|jpeg|png|gif)$/i)) {
-            const imgData = await mediaFile.async('base64');
-            const ext = imgMatch[1].split('.').pop().toLowerCase();
-            const mime = ext === 'jpg' || ext === 'jpeg' ? 'image/jpeg' : `image/${ext}`;
-            thumbUrl = `data:${mime};base64,${imgData}`;
-          }
-        }
-      }
-
-      slides.push({
-        id: i + 1,
-        num: i + 1,
-        title: `Slide ${i + 1}`,
-        type: currentCategory,
-        thumbUrl,
-        fileItemId: fileItem.id,
-        slideIndex: i
+    // Load thumbnails in batches of 10
+    const batchSize = 10;
+    for (let i = 0; i < files.length; i += batchSize) {
+      const batch = files.slice(i, i + batchSize);
+      const thumbPromises = batch.map(async (f) => {
+        let thumbUrl = "";
+        try {
+          const thumbData = await graph(`/drives/${driveId}/items/${f.id}/thumbnails`);
+          const ts = thumbData.value?.[0];
+          thumbUrl = ts?.large?.url || ts?.medium?.url || ts?.small?.url || "";
+        } catch(e) {}
+        return {
+          id: currentSlides.length + 1,
+          num: currentSlides.length + 1,
+          title: f.name.replace(/\.pptx$/i, "").replace(/^Slide \d+ - /, ""),
+          filename: f.name,
+          thumbUrl,
+          fileId: f.id
+        };
       });
+      const batchSlides = await Promise.all(thumbPromises);
+      batchSlides.forEach(s => { s.id = currentSlides.length + 1; s.num = currentSlides.length + 1; currentSlides.push(s); });
+      renderSlideGrid(currentSlides);
     }
-
-    currentSlides = slides;
-    renderSlideGrid(currentSlides);
-
   } catch(e) {
     grid.innerHTML = `<div style="grid-column:1/-1" class="empty"><div class="empty-icon">⚠️</div><p>${e.message}</p></div>`;
   }
 }
 
-async function loadJSZip() {
-  if (window.JSZip) return window.JSZip;
-  return new Promise((resolve, reject) => {
-    const s = document.createElement('script');
-    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
-    s.onload = () => resolve(window.JSZip);
-    s.onerror = reject;
-    document.head.appendChild(s);
-  });
-}
-
 function renderSlideGrid(slides) {
-  const q = document.getElementById("search").value.toLowerCase();
-  const filtered = q ? slides.filter(s => s.title.toLowerCase().includes(q) || s.type.toLowerCase().includes(q)) : slides;
+  const q = (document.getElementById("search")?.value || "").toLowerCase();
+  const filtered = q ? slides.filter(s => s.title.toLowerCase().includes(q)) : slides;
   const grid = document.getElementById("slide-grid");
-
-  if (!filtered.length) {
-    grid.innerHTML = `<div style="grid-column:1/-1" class="empty"><div class="empty-icon">🔍</div><p>No slides match</p></div>`;
-    return;
-  }
-
+  if (!filtered.length) { grid.innerHTML = `<div style="grid-column:1/-1" class="empty"><div class="empty-icon">🔍</div><p>No slides match</p></div>`; return; }
   grid.innerHTML = filtered.map(s => `
-    <div class="card ${selected.has(s.id) ? 'selected' : ''}" id="card-${s.id}"
+    <div class="card ${selected.has(s.id) ? "selected" : ""}" id="card-${s.id}"
          onclick="toggleSel(${s.id})"
          onmousedown="startPress(${s.id})" onmouseup="endPress()" onmouseleave="endPress()"
          ontouchstart="startPress(${s.id})" ontouchend="endPress()">
       <div class="card-check">✓</div>
       <span class="card-num">#${s.num}</span>
       ${s.thumbUrl
-        ? `<img class="card-thumb" src="${s.thumbUrl}" loading="lazy" alt="Slide ${s.num}">`
-        : `<div class="card-thumb-ph">🖼️</div>`}
+        ? `<img class="card-thumb" src="${s.thumbUrl}" loading="lazy" alt="">`
+        : `<div class="card-thumb-ph">Loading…</div>`}
       <div class="card-body">
-        <div class="card-title">${s.title}</div>
-        <div class="card-type">${s.type}</div>
+        <div class="card-title" title="${s.title}">${s.title}</div>
       </div>
-    </div>
-  `).join('');
+    </div>`).join("");
 }
 
 // ── Selection ──
 function toggleSel(id) {
-  if (selected.has(id)) selected.delete(id);
-  else selected.add(id);
-  const card = document.getElementById("card-" + id);
-  if (card) card.classList.toggle("selected", selected.has(id));
+  if (selected.has(id)) selected.delete(id); else selected.add(id);
+  document.getElementById("card-"+id)?.classList.toggle("selected", selected.has(id));
   updateBar();
   if (previewId === id) updatePreviewBtn();
 }
-
-function clearSel() {
-  selected.clear();
-  document.querySelectorAll(".card.selected").forEach(c => c.classList.remove("selected"));
-  updateBar();
-}
-
+function clearSel() { selected.clear(); document.querySelectorAll(".card.selected").forEach(c=>c.classList.remove("selected")); updateBar(); }
 function updateBar() {
   const n = selected.size;
-  document.getElementById("sel-count").textContent = n ? `${n} slide${n > 1 ? 's' : ''} selected` : "0 selected";
+  document.getElementById("sel-count").textContent = n ? `${n} slide${n>1?"s":""} selected` : "0 selected";
   document.getElementById("btn-insert").disabled = n === 0;
   document.getElementById("btn-clear").style.display = n ? "block" : "none";
 }
 
-// ── Long press → preview ──
+// ── Long press preview ──
 function startPress(id) { pressTimer = setTimeout(() => openPreview(id), 500); }
 function endPress() { clearTimeout(pressTimer); }
-
 function openPreview(id) {
-  const s = currentSlides.find(x => x.id === id);
-  if (!s) return;
+  const s = currentSlides.find(x => x.id === id); if (!s) return;
   previewId = id;
-  document.getElementById("prev-img").src = s.thumbUrl || '';
+  document.getElementById("prev-img").src = s.thumbUrl || "";
   document.getElementById("prev-title").textContent = s.title;
-  document.getElementById("prev-meta").textContent = `${currentTheme?.label} · ${currentCategory} · Slide #${s.num}`;
+  document.getElementById("prev-meta").textContent = currentCategory + " · #" + s.num;
   updatePreviewBtn();
   document.getElementById("preview").classList.add("open");
 }
-
 function updatePreviewBtn() {
   const btn = document.getElementById("btn-prev-sel");
   const sel = selected.has(previewId);
@@ -733,171 +520,80 @@ function updatePreviewBtn() {
   btn.style.background = sel ? "#4ade80" : "var(--accent)";
   btn.style.color = sel ? "#000" : "#fff";
 }
-
 function toggleFromPreview() { if (previewId !== null) toggleSel(previewId); }
 function closePreview() { document.getElementById("preview").classList.remove("open"); }
-function closePreviewClick(e) { if (e.target === document.getElementById("preview")) closePreview(); }
 
-// ── Insert into PowerPoint ──
+// ── Insert ──
 async function insertSlides() {
   const selSlides = [...selected].map(id => currentSlides.find(s => s.id === id)).filter(Boolean);
   if (!selSlides.length) return;
-
-  showToast(`Inserting ${selSlides.length} slide${selSlides.length > 1 ? 's' : ''}…`, "#6c63ff");
-
+  showToast(`Inserting ${selSlides.length} slide${selSlides.length>1?"s":""}…`, "#6c63ff");
   try {
     await Office.onReady();
-
-    // Get the PPTX file as base64
-    let pptxBase64 = window._currentPptxBase64;
-
-    if (!pptxBase64) {
-      const fileData = await graph(`/drives/${driveId}/items/${selSlides[0].fileItemId}`);
-      const dlUrl = fileData['@microsoft.graph.downloadUrl'];
+    for (const slide of selSlides) {
+      // Download each single-slide PPTX and insert it
+      const fileData = await graph(`/drives/${driveId}/items/${slide.fileId}`);
+      const dlUrl = fileData["@microsoft.graph.downloadUrl"];
       const resp = await fetch(dlUrl);
       const buffer = await resp.arrayBuffer();
-      // Convert to base64 in chunks to avoid stack overflow
       const bytes = new Uint8Array(buffer);
-      let binary = '';
-      const chunkSize = 8192;
-      for (let i = 0; i < bytes.length; i += chunkSize) {
-        binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize));
-      }
-      pptxBase64 = btoa(binary);
-      window._currentPptxBase64 = pptxBase64;
+      let binary = "";
+      const chunk = 8192;
+      for (let i = 0; i < bytes.length; i += chunk) binary += String.fromCharCode(...bytes.subarray(i, i+chunk));
+      const b64 = btoa(binary);
+      await PowerPoint.run(async context => {
+        context.presentation.insertSlidesFromBase64(b64, { formatting: "UseDestinationTheme" });
+        await context.sync();
+      });
     }
-
-    await PowerPoint.run(async context => {
-      // Insert only the selected slides by their 0-based index
-      for (const slide of selSlides) {
-        context.presentation.insertSlidesFromBase64(pptxBase64, {
-          formatting: "UseDestinationTheme",
-          sourceSlideIds: [slide.slideIndex + 1] // 1-based slide ID
-        });
-      }
-      await context.sync();
-    });
-
-    showToast(`✓ ${selSlides.length} slide${selSlides.length > 1 ? 's' : ''} inserted!`);
+    showToast(`✓ ${selSlides.length} slide${selSlides.length>1?"s":""} inserted!`);
     clearSel();
-
-  } catch(e) {
-    showToast("Insert failed: " + e.message, "#ef4444");
-    console.error('Insert error:', e);
-  }
-}
-
-function blobToBase64(blob) {
-  return new Promise(resolve => {
-    const r = new FileReader();
-    r.onload = () => resolve(r.result.split(",")[1]);
-    r.readAsDataURL(blob);
-  });
+  } catch(e) { showToast("Insert failed: " + e.message, "#ef4444"); }
 }
 
 // ── Navigation ──
 function goToStep(step) {
-  // Hide all steps
-  document.getElementById("step-theme").style.display = "none";
-  document.getElementById("step-category").style.display = "none";
-  document.getElementById("step-slides").style.display = "none";
-  document.getElementById("bottom-bar").style.display = "none";
-
-  // Update logo mark
-  if (currentTheme) {
-    document.getElementById("logo-mark").textContent = currentTheme.emoji;
-  } else {
-    document.getElementById("logo-mark").textContent = "📊";
-  }
-
-  if (step === 1) {
-    document.getElementById("step-theme").style.display = "flex";
-    updateBreadcrumb(1);
-    currentTheme = null;
-    currentCategory = null;
-  } else if (step === 2) {
-    document.getElementById("step-category").style.display = "flex";
-    updateBreadcrumb(2);
-    currentCategory = null;
-  } else if (step === 3) {
-    document.getElementById("step-slides").style.display = "flex";
-    document.getElementById("bottom-bar").style.display = "flex";
-    updateBreadcrumb(3);
-  }
+  document.getElementById("step-categories").style.display = step === 1 ? "flex" : "none";
+  document.getElementById("step-slides").style.display = step === 2 ? "flex" : "none";
+  document.getElementById("bottom-bar").style.display = step === 2 ? "flex" : "none";
+  updateBreadcrumb(step);
 }
 
 function updateBreadcrumb(step) {
   const bc = document.getElementById("breadcrumb");
-  let html = `<span class="bc-item ${step===1?'active':''}" onclick="${step>1?'goToStep(1)':''}">Theme</span>`;
-  if (step >= 2 && currentTheme) {
-    html += `<span class="bc-sep">›</span>
-             <span class="bc-dot" style="background:${currentTheme.color}"></span>
-             <span class="bc-item ${step===2?'active':''}" onclick="${step>2?'goToStep(2)':''}">${currentTheme.label}</span>`;
-  }
-  if (step >= 3 && currentCategory) {
-    html += `<span class="bc-sep">›</span>
-             <span class="bc-item active">${shortCatName(currentCategory)}</span>`;
+  let html = `<span class="bc-item ${step===1?"active":""}" onclick="${step>1?"loadCategories()":""}" style="${step>1?"cursor:pointer":""}">Categories</span>`;
+  if (step >= 2 && currentCategory) {
+    html += `<span class="bc-sep">›</span><span class="bc-item active">${currentCategory}</span>`;
   }
   bc.innerHTML = html;
-}
-
-function shortCatName(name) {
-  const map = {
-    "Assessment and Comparison": "Assessment",
-    "Charts and Data Visualization": "Charts",
-    "Executive Summary Findings and Insights": "Exec Summary",
-    "M&A and Due Diligence": "M&A",
-    "Organization and Governance": "Org & Gov",
-    "Planning Roadmap and Implementation": "Roadmap",
-    "Problem Structuring and Frameworks": "Frameworks",
-    "Text and Content Layouts": "Text Layouts"
-  };
-  return map[name] || name.split(' ').slice(0,2).join(' ');
 }
 
 function syncCurrent() {
   const btn = document.getElementById("sync-btn");
   btn.classList.add("spinning");
   setTimeout(() => btn.classList.remove("spinning"), 1000);
-
-  // Re-load current step
-  if (currentTheme && currentCategory && window._categoryFiles) {
-    const filename = Object.keys(window._categoryFiles).find(f =>
-      f.replace(/\.(pptx|potx)$/i,'') === currentCategory
-    );
-    if (filename) {
-      loadSlides(window._categoryFiles[filename]);
-      return;
-    }
+  if (currentCategory && window._categoryFolders?.[currentCategory]) {
+    loadSlides(window._categoryFolders[currentCategory]);
+  } else {
+    loadCategories();
   }
-  if (currentTheme) { loadCategories(currentTheme.id); return; }
-  renderThemes();
 }
 
-// ── Toast ──
-function showToast(msg, color = "var(--success)") {
+function showToast(msg, color="var(--success)") {
   const t = document.getElementById("toast");
-  t.textContent = msg;
-  t.style.background = color;
-  t.classList.add("show");
-  setTimeout(() => t.classList.remove("show"), 2800);
+  t.textContent = msg; t.style.background = color;
+  t.classList.add("show"); setTimeout(() => t.classList.remove("show"), 2800);
 }
 
-// ── Search ──
 document.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("search").addEventListener("input", () => {
-    renderSlideGrid(currentSlides);
-  });
-  document.addEventListener("keydown", e => {
-    if (e.key === "Escape") closePreview();
-  });
+  document.getElementById("search")?.addEventListener("input", () => renderSlideGrid(currentSlides));
+  document.addEventListener("keydown", e => { if (e.key === "Escape") closePreview(); });
 });
 
-// ── Boot ──
-if (typeof Office !== 'undefined' && Office.onReady) {
+if (typeof Office !== "undefined" && Office.onReady) {
   Office.onReady(() => { initMsal(); });
 } else {
-  window.addEventListener('load', initMsal);
+  window.addEventListener("load", initMsal);
 }
 </script>
 </body>
