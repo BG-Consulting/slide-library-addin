@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Slide Library</title>
 <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
-<script src="https://alcdn.msauth.net/browser/2.39.0/js/msal-browser.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-authentication-library-for-js/2.38.3/msal-browser.min.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
 
@@ -281,34 +281,44 @@ let pressTimer = null;
 
 // ── MSAL init ──
 async function initMsal() {
-  msalApp = new msal.PublicClientApplication({
-    auth: {
-      clientId: CONFIG.CLIENT_ID,
-      authority: `https://login.microsoftonline.com/${CONFIG.TENANT_ID}`,
-      redirectUri: window.location.origin + window.location.pathname
-    },
-    cache: { cacheLocation: "sessionStorage" }
-  });
-  await msalApp.initialize();
-
-  // Handle redirect
-  try {
-    const result = await msalApp.handleRedirectPromise();
-    if (result) token = result.accessToken;
-  } catch(e) { /* ignore */ }
-
-  const accounts = msalApp.getAllAccounts();
-  if (accounts.length > 0 && !token) {
-    try {
-      const r = await msalApp.acquireTokenSilent({ scopes: CONFIG.SCOPES, account: accounts[0] });
-      token = r.accessToken;
-    } catch(e) { token = null; }
+  // Check MSAL loaded
+  if (typeof msal === 'undefined') {
+    showError("Authentication library failed to load. Please refresh the add-in.");
+    return;
   }
 
-  if (token) {
-    showMain();
-  } else {
-    show("s-signin");
+  try {
+    msalApp = new msal.PublicClientApplication({
+      auth: {
+        clientId: CONFIG.CLIENT_ID,
+        authority: `https://login.microsoftonline.com/${CONFIG.TENANT_ID}`,
+        redirectUri: window.location.origin + window.location.pathname
+      },
+      cache: { cacheLocation: "sessionStorage" }
+    });
+    await msalApp.initialize();
+
+    // Handle redirect
+    try {
+      const result = await msalApp.handleRedirectPromise();
+      if (result) token = result.accessToken;
+    } catch(e) { /* ignore */ }
+
+    const accounts = msalApp.getAllAccounts();
+    if (accounts.length > 0 && !token) {
+      try {
+        const r = await msalApp.acquireTokenSilent({ scopes: CONFIG.SCOPES, account: accounts[0] });
+        token = r.accessToken;
+      } catch(e) { token = null; }
+    }
+
+    if (token) {
+      showMain();
+    } else {
+      show("s-signin");
+    }
+  } catch(e) {
+    showError("Failed to initialize authentication: " + e.message);
   }
 }
 
