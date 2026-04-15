@@ -314,16 +314,26 @@ async function initMsal() {
 
 async function signIn() {
   try {
+    // Try popup first (desktop PowerPoint)
     const r = await msalApp.loginPopup({ scopes: CONFIG.SCOPES });
     token = r.accessToken;
     showMain();
   } catch(e) {
-    showError("Sign-in failed: " + e.message);
+    // Fallback to redirect (PowerPoint Web)
+    try {
+      await msalApp.loginRedirect({ scopes: CONFIG.SCOPES });
+    } catch(e2) {
+      showError("Sign-in failed: " + e2.message);
+    }
   }
 }
 
 function signOut() {
-  msalApp.logoutPopup().then(() => location.reload());
+  try {
+    msalApp.logoutPopup().then(() => location.reload());
+  } catch(e) {
+    msalApp.logoutRedirect();
+  }
 }
 
 async function getToken() {
@@ -738,9 +748,11 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // ── Boot ──
-Office.onReady(() => { initMsal(); });
-// Also boot outside Office (browser testing)
-if (typeof Office === 'undefined' || !Office.onReady) { initMsal(); }
+if (typeof Office !== 'undefined' && Office.onReady) {
+  Office.onReady(() => { initMsal(); });
+} else {
+  window.addEventListener('load', initMsal);
+}
 </script>
 </body>
 </html>
